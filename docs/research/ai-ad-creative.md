@@ -124,10 +124,13 @@ recommending Imagen is stale. This is a good illustration of why the ticket's in
 rather than recall was the right instruction.
 
 Black Forest Labs' FLUX line is live and current (FLUX 3, FLUX.2, FLUX.2 Max, FLUX.2 Klein, plus the
-FLUX Tools editing models), and is the usual choice when you want in-place photo editing at low cost,
-but **I could not extract per-image prices** — bfl.ai's pricing page renders its table through
-JavaScript and returned only a video-pricing example to automated fetching. **Flagged as
-unconfirmed**; price it by hand or via fal.ai / Replicate before relying on a number.
+FLUX Tools editing models), and is the usual choice when you want in-place photo editing at low cost.
+BFL's own pricing page renders its table through JavaScript and returned only a video-pricing example
+to automated fetching, so **first-party FLUX prices are unconfirmed**. The aggregator
+[fal.ai](https://fal.ai/pricing) lists **FLUX Kontext Pro at $0.04 per image** — Kontext is the
+editing line, the one that takes your photo as input — which is the right order of magnitude and the
+practical way to access these models anyway. Confirm against BFL directly before it goes in a
+pricing model.
 
 ### The order-of-magnitude conclusion
 
