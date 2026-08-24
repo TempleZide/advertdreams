@@ -1,0 +1,32 @@
+{
+  "hero": {
+    "photo_id": "01-mulchers-working",
+    "kicker": "FORESTRY MULCHING",
+    "headline": "Overgrown Land? Cleared.",
+    "subline": "Serving Lenoir, Hickory & more",
+    "cta": "Free Estimate",
+    "primary_text": "Waist-high brush and briars? Our mulching heads grind it down on site, no burning, no hauling. Serving Lenoir, Hickory and Morganton."
+  },
+  "before_after": {
+    "before_photo_id": "02-before-overgrown",
+    "after_photo_id": "03-after-mulched",
+    "before_label": "OVERGROWN",
+    "after_label": "MULCHED",
+    "headline": "No Burn. No Haul. Done.",
+    "subline": "Brush cleared same day, on site",
+    "cta": "Get Free Estimate",
+    "primary_text": "No burning piles, no hauling debris. We grind overgrown brush right where it stands, Caldwell and Burke County."
+  },
+  "proof": {
+    "photo_id": "05-after-cleared",
+    "headline": "Clears What a Dozer Can't",
+    "points": [
+      "No burn piles, no haul",
+      "Free estimates",
+      "Locally owned, Lenoir NC"
+    ],
+    "subline": "Steep slopes, dense brush, done right",
+    "cta": "Call Chad Cannon",
+    "primary_text": "Steep, brushy acreage a dozer can't touch? Our mulching clears it in place. Free estimates, locally owned in Lenoir NC."
+  }
+}

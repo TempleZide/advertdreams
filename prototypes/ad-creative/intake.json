@@ -1,0 +1,42 @@
+{
+  "client": {
+    "business_name": "Appalachian Excavating & Grading",
+    "owner_name": "Chad Cannon",
+    "base_town": "Lenoir, NC",
+    "phone": "(828) 217-0312",
+    "vertical": "civil-construction",
+    "brand": { "primary": "#c8641a", "ink": "#171412" },
+    "proof": [
+      "Locally owned, Lenoir NC",
+      "Free estimates",
+      "No burn piles, no hauling"
+    ]
+  },
+  "service_area": [
+    "Lenoir", "Hickory", "Morganton",
+    "Caldwell County", "Burke County", "Catawba County",
+    "Alexander County", "Watauga County"
+  ],
+  "services": [
+    "Forestry Mulching",
+    "Land Clearing",
+    "Excavating & Grading",
+    "Driveways & Road Building",
+    "Storm Damage Cleanup",
+    "Wood Chipping",
+    "Erosion Control"
+  ],
+  "campaign_service": "Forestry Mulching",
+  "service_notes": "Rotary mulching head grinds brush, invasive species and small trees on site instead of hauling debris away or burning it. The mulch layer holds topsoil, cuts erosion and slows regrowth of weeds and briars. Reaches steep slopes and dense brush a bulldozer cannot work safely. Clears combustible undergrowth around structures. Selective: takes the invasive growth and leaves the trees the owner wants. Typical buyers are owners of overgrown acreage in the Western North Carolina foothills, new homesite buyers, and people creating defensible space or pasture.",
+  "photos": [
+    { "id": "01-mulchers-working", "caption": "Two tracked forestry mulching machines working side by side on a hillside they have just mulched, fresh chip layer underfoot, standing hardwoods behind. Bright day." },
+    { "id": "02-before-overgrown", "caption": "BEFORE: a field gone to waist-high grass, briars and scrub saplings running back into treeline. Nothing usable." },
+    { "id": "03-after-mulched", "caption": "AFTER of the same field: open, level, covered in pale wood mulch, yellow mulching machine parked at left, treeline preserved behind." },
+    { "id": "04-before-brush", "caption": "BEFORE: a sloping lot choked with dead brush piles and scrub under bare autumn trees." },
+    { "id": "05-after-cleared", "caption": "AFTER of the same slope: brush gone, clean mulched ground running up to the treeline, power pole standing clear." },
+    { "id": "06-lakeside-homesite", "caption": "Cleared and graded lakeside homesite, dozer tracks in red clay, lake and wooded ridge behind, tall pines left standing at the edge." },
+    { "id": "07-dozer", "caption": "Yellow John Deere dozer parked on a red clay cut with a lake and ridgeline in the distance, blue sky." },
+    { "id": "08-mountain-pad", "caption": "Finished graded building pad on a ridge, red clay smooth and rolled, spring hardwoods and a mountain peak in the background." },
+    { "id": "09-excavator-clearing", "caption": "Excavator working a partly cleared lot, stumps and soil turned, standing timber behind." }
+  ]
+}
