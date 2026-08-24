@@ -8,7 +8,7 @@ A business that pays advertdreams a subscription. Small business or independent 
 
 ## Lead
 
-A potential customer of the Client, captured by advertdreams and handed to the Client. A Lead originates from one of the Client's Campaigns and arrives by landing-page form submission, phone call, or SMS to a Tracking Number.
+A potential customer of the Client, captured by advertdreams and handed to the Client. A Lead originates from one of the Client's Campaigns and arrives by instant-form submission, by a form on the Client's Site, or by phone call or SMS to a Tracking Number.
 
 Not every inbound contact is a Lead: what qualifies (wrong numbers, spam, repeat callers) is an open decision, not settled here.
 
@@ -26,11 +26,21 @@ The information collected from a Client that everything else is generated from: 
 
 ## Creative
 
-One generated advertisement: an image plus ad copy. Multiple Creatives are generated per Service so the Client can choose and so the platform can optimise between them.
+One generated advertisement: an image or a video, plus ad copy. Multiple Creatives are generated per Service so the Client can choose and so the platform can optimise between them. Creatives are built from the Client's own media, not generated from nothing.
+
+## Site
+
+The web presence advertdreams hosts for a Client — where their ads send people, and where a Lead can fill in a form. Chosen by the Client from a small set of ready-made styles and filled with their own Services, service area, and media.
+
+Deliberately not called a "page": the Client also has a Facebook Page, which is a different thing owned by a different party.
 
 ## Campaign
 
-A Client's advertising activity on Meta for a set of Services — the targeting, the budget, and the Creatives running against it. A Campaign is what spends money and what a Lead is attributed to.
+A Client's advertising activity on an ad platform for a set of Services — the targeting, the budget, and the Creatives running against it. A Campaign is what spends money and what a Lead is attributed to.
+
+## Tier
+
+A level of subscription. A Tier fixes the price the Client pays, the Ad Spend included at that price, and what else the Client gets. Every Tier carries a cap on Ad Spend, because advertdreams funds it.
 
 ## Tracking Number
 
