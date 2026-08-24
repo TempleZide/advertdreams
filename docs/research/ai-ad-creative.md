@@ -270,16 +270,44 @@ Meta's own statement of the labelling rules is in
 - On third-party tools: *"We will also begin automatically detecting ads created or edited using
   third-party AI tools through industry-standard signals."*
 
+Meta's Business Help Center is more specific than the newsroom post, and names the mechanism outright
+([Ads and AI info labels](https://www.facebook.com/business/help/1010479435004531)):
+
+> "Meta uses industry-standard detection methods, such as C2PA to identify when ad content has been
+> created or edited using third-party generative AI tools. **When we detect this metadata, we label
+> the content accordingly.**"
+
+and on its own tools:
+
+> "We will automatically apply an AI info label when you use features such as Background Generation,
+> Image Generation, or Add Animation to create or significantly edit an image or video."
+
+Two practical details that are easy to miss and worth building around:
+
+- **Ads Manager warns you before you publish.** *"Before publishing, you will see a message during
+  the ad creation process letting you know when an AI info label will appear on your ad."* That is a
+  free, authoritative test — no guessing about whether a given creative trips the detector.
+- **An optional self-disclosure toggle exists in certain regions.** *"You may choose to deliver ads
+  to states or countries where local laws or guidelines include specific AI transparency
+  requirements... advertisers will have the opportunity to self-disclose that GenAI was used and if
+  they do so, the label will appear on the ad next to the Sponsored label."* Meta lists the European
+  Region, California, New York, India and Taiwan. Note the framing: Meta offers the toggle; any
+  *obligation* comes from local law, not from Meta. **A UK-targeting advertiser is inside the
+  European Region here** — worth a legal look, and it is not something Meta will decide for you.
+
 Three consequences for advertdreams:
 
 1. **Labelling is applied by Meta, not declared by the advertiser.** There is no API field to fill in
    and no compliance workflow to build. The lever advertdreams controls is what it sends, not what it
    declares.
-2. **"Industry-standard signals" means C2PA content credentials and provider watermarking.** Every
-   major image model now embeds these. If advertdreams sends a generated image, assume it will be
-   detected and labelled. Assume that stripping the metadata does not help, because the invisible
-   watermark survives it — and attempting to strip it is the kind of thing that reads badly if the
-   account is ever reviewed by a human.
+2. **For third-party tools the documented trigger is C2PA metadata in the uploaded file**, not a
+   pixel classifier. Meta names no image classifier on the ads pathway — classifiers are documented
+   only for organic content. If advertdreams sends a generated image, assume it will be detected and
+   labelled. Do not build a metadata-stripping step: it is the kind of thing that reads badly if the
+   account is ever reviewed by a human, and provider watermarking is designed to survive it anyway.
+   **One caveat worth knowing:** boosting an organic post inherits the *organic* labelling regime,
+   which does include classifiers — *"Organic labels may remain present when a piece of organic
+   content is directly boosted to an ad via the boosting flow."* Publish as ads, not as boosts.
 3. **A photorealistic generated human is the worst case.** It puts a visible AI label next to
    "Sponsored" on the ad itself. A generated "friendly contractor in a hi-vis vest" — an obvious
    temptation for this vertical — is precisely the creative choice that earns the most prominent
@@ -291,35 +319,77 @@ nothing to fire on.
 
 ### Restrictions relevant to home and property services
 
-**Before/after imagery is permitted for construction work.** Meta's before/after restriction lives in
-the [Unrealistic Outcomes](https://transparency.meta.com/en-gb/policies/ad-standards/deceptive-content/unrealistic-outcomes/)
-standard and is scoped to health, weight loss, and body image — it prohibits ads that *"imply or
-attempt to generate negative self-perception in order to promote diet, weight loss or other
-health-related products"* and use of *"before-and-after images to display idealised results"* in that
-context. It does not reach a photograph of a driveway before and after resurfacing. **The single most
-effective creative format for this vertical is available.** This should be the default layout
-template.
+**Before/after imagery is permitted for construction work.** The only live before/after prohibition in
+Meta's Advertising Standards is in the
+[suicide, self-injury and eating disorders](https://transparency.meta.com/policies/ad-standards/objectionable-content/suicide-selfinjury-eating-disorders/)
+standard, which bars ads that
 
-**Home improvement is very probably not a Housing Special Ad Category ad — but confirm it.** The
-Marketing API's `special_ad_categories` enum is `HOUSING`, `FINANCIAL_PRODUCTS_SERVICES`,
-`EMPLOYMENT`, `ISSUES_ELECTIONS_POLITICS`, `NONE`
-([Marketing API docs](https://developers.facebook.com/docs/marketing-api/audiences/special-ad-category)).
-The category exists to enforce anti-discrimination law around housing *opportunities* — sale, rental,
-listings, home listing catalogs — and a contractor selling groundworks is a service provider, not a
-housing opportunity. Meta's developer documentation does not state an explicit definition of
-"housing", so this is a reasoned inference, not a quoted rule.
+> "Contain side by side imagery depicting before and after weight loss/gain not related to the use of
+> a product or service."
 
-It matters more than it looks, because the restrictions are severe for a local trade:
+Note both limiters: *weight loss/gain*, and only when *not related to a product or service*. The
+[Health and Wellness](https://transparency.meta.com/policies/ad-standards/restricted-goods-services/health-wellness/)
+standard is actually permissive — cosmetic before/after transformations are allowed, gated to 18+.
+**No Meta advertising standard restricts before/after photographs of construction, groundworks,
+driveways or drainage.** The single most effective creative format for this vertical is available,
+and it should be the default layout template.
 
-- Location selection *"must include all areas equal or larger than 15 mile or 25 kilometer radius"*
-- *"Location exclusion is not supported"*
-- Behaviour and demographic targeting prohibited; lookalike audiences unavailable
-- Age fixed to 18-65+, gender cannot be specified
+*Sourcing caveat:* the old standalone "Unrealistic Outcomes" policy page, which historically carried
+a broader before/after rule, now 404s at its documented URL and no longer appears in the Advertising
+Standards contents — its substance seems folded into
+[Unacceptable Business Practices](https://transparency.meta.com/policies/ad-standards/fraud-scams/unacceptable-business-practices/).
+An `/en-gb/` variant of the old URL still served content when fetched, so Meta's own URL space is
+inconsistent here. If someone cites "Meta's Unrealistic Outcomes policy" at you, check whether it
+still exists before acting on it. The conclusion above does not depend on that page either way.
 
-A groundworks firm that works a 10-mile radius could not be targeted correctly under those rules.
-**Flagged as an open risk for the targeting ticket** — get this confirmed with Meta before the
-targeting model is specified, because if home services were ever ruled Housing, the targeting design
-changes fundamentally.
+**Home improvement may well BE a Housing Special Ad Category ad. Two live Meta pages contradict each
+other.** This is the most consequential finding in the document and it reverses my first reading.
+
+Meta's [How to choose a Special Ad Category](https://www.facebook.com/business/help/298000447747885)
+page defines Housing as:
+
+> "Ads that promote or directly link to a housing opportunity or related service, including but not
+> limited to listings for the sale or rental of a home or apartment, homeowners insurance, mortgage
+> insurance, mortgage loans, **housing repairs** and home equity or appraisal services."
+
+"Housing repairs" is on the list, in Meta's own words. But the dedicated
+[About ads for housing](https://www.facebook.com/business/help/1198401317374558) page enumerates
+sale/rental listings, insurance, mortgage loans, financing, home equity and appraisal, real estate
+and house-hunting services, and aggregators — and **does not mention repairs at all**. Its exclusion
+list (hotels, resorts, retreats, homeownership tips, fair-housing education) does not exclude them
+either. Both lists are explicitly open-ended ("including but not limited to", "and more", "aren't
+comprehensive").
+
+So a groundworks contractor sits in a genuine gap between two Meta pages, and neither resolves it.
+The governing test on both is the same abstract phrase: *"promotes or directly links to a housing
+opportunity or related service."* Driveways and drainage are plausibly a "related service"; they are
+plausibly not.
+
+**Why this is the top risk on the map, not a footnote.** If it applies and the category is not
+declared, *"your ad may be rejected"* — a flat rejection with nothing wrong with the creative at all.
+If it applies and the category *is* declared, the targeting restrictions bite hard
+([Marketing API](https://developers.facebook.com/docs/marketing-api/audiences/special-ad-category),
+`special_ad_categories` enum: `HOUSING`, `FINANCIAL_PRODUCTS_SERVICES`, `EMPLOYMENT`,
+`ISSUES_ELECTIONS_POLITICS`, `NONE`, set at campaign level):
+
+- *"Audiences based on city or pin drop locations will include an expanded radius"* — the Marketing
+  API states a floor of *"15 mile or 25 kilometer radius"*, and *"Location exclusion is not
+  supported"*
+- Age, gender, postcode, exclusion targeting, lookalike audiences and saved audiences limited or
+  unavailable; some interests unavailable
+- Behaviour and demographic targeting prohibited
+
+A firm that works a 10-mile patch cannot be targeted to a 10-mile patch. That does not merely tune
+the targeting model — it changes the unit economics, because advertdreams pays for the wasted
+impressions out of its own agency account.
+
+The trigger is being a US advertiser, or targeting the US, Canada, or ~45 European territories
+**including the United Kingdom**.
+
+**Do not let this be settled by inference — including mine.** Get a written answer from Meta support,
+or run one test campaign each way, before the targeting model or the pricing model is fixed. It
+blocks [#8](https://github.com/TempleZide/advertdreams/issues/8) and
+[#9](https://github.com/TempleZide/advertdreams/issues/9) more than this creative question does.
 
 ### Ad specifications (Facebook Feed image ad)
 
@@ -360,7 +430,16 @@ the only place generation is actually needed in this pipeline.
 
 ### Does generated imagery risk ad rejection?
 
-**Not for being AI-generated.** Meta's
+**Not for being AI-generated — Meta says so directly.** From
+[Meta's own guidance](https://www.facebook.com/business/help/1486382031937045):
+
+> "Automated detection does not change ad eligibility. Your ads must still comply with all applicable
+> ad policies."
+
+> "You cannot request removal of automated detected labels."
+
+An AI label is a disclosure, not a penalty and not a strike. It is also permanent once applied.
+Meta's
 [Advertising Standards](https://transparency.meta.com/en-gb/policies/ad-standards/) contain no
 prohibition on AI-generated or synthetic ad imagery. The top-level categories are Community
 Standards, Unacceptable Content, Fraud/Scams/Deceptive Practices, Restricted Goods & Services,
@@ -431,30 +510,47 @@ Two design consequences worth carrying into the pipeline ticket:
 
 ## Open risks and things I could not confirm
 
-Listed so they are not quietly forgotten, roughly in order of how much they would hurt.
+Listed so they are not quietly forgotten, in order of how much they would hurt.
 
-1. **Housing Special Ad Category.** Meta publishes the enum but not a definition of what counts as a
-   housing ad. My reading is that a contractor selling services is not offering a housing
-   opportunity, but I could not find Meta text saying so. If wrong, the 15-mile / 25 km minimum
-   radius and the ban on location exclusion break local targeting for a trade that works a 10-mile
-   patch. **Confirm before the targeting model is specified.**
+1. **Housing Special Ad Category — unresolved, and two live Meta pages contradict each other.**
+   The Special Ad Category page lists "housing repairs" inside Housing; the dedicated housing page
+   omits repairs entirely. Both lists are open-ended. Getting this wrong costs either flat ad
+   rejections (category not declared when it should be) or a targeting radius far wider than a local
+   trade's service area (declared when it need not be). **Confirm with Meta in writing, or by test
+   campaign, before the targeting and pricing models are fixed.** Blocks #8 and #9.
 2. **The 20% text-in-image rule.** Believed removed and absent from the fetchable Ads Guide spec, but
    Meta's Business Help Center pages are JavaScript-rendered and would not yield body text to
    automated fetching. The compositing recommendation assumes burned-in headline text carries no
-   delivery penalty. Verify by hand.
-3. **What counts as a "significant edit"** for AI labelling purposes. Meta uses the phrase and never
-   defines it. This is the boundary that decides whether outpainting a photo to 4:5 gets the ad an AI
-   label. Treat outpainting as label-triggering until proven otherwise, and prefer asking Clients to
-   shoot portrait.
-4. **Third-party AI detection in practice.** Meta says it will *"begin automatically detecting ads
-   created or edited using third-party AI tools through industry-standard signals"* — announced, but
-   with no published detail on which signals, what the false-positive rate is, or whether a composited
-   real photo could ever trip it. Worth an empirical check once the pipeline runs: publish one
-   composited creative and look at whether an AI label appears.
-5. **Client photo rights and consent.** Out of scope for this ticket and already on the map's "not yet
-   specified" list, but this research touches it: if the pipeline inpaints out a bystander's face or a
-   licence plate, that is a privacy measure with real value, and if it does not, the Client's raw
-   photos go to Meta as-is. Flagging the connection.
+   delivery penalty. Verify by hand in Ads Manager.
+3. **What counts as a "significant edit"** for AI labelling. Meta uses the phrase and never defines
+   it. This decides whether outpainting a photo to 4:5 earns an AI label. Mitigated in practice by
+   the pre-publish warning in Ads Manager — build the check into the workflow rather than reasoning
+   about it. Also unconfirmed: whether Meta's own **image expansion** and **text generation** features
+   trigger labels; both sit inside the Ad Creative Generative AI Terms but neither appears in the
+   labelled-features list.
+4. **Whether Meta strips or preserves C2PA / IPTC / EXIF metadata on upload.** No Meta page addresses
+   metadata retention. Do not assume either way — relevant both to AI detection and to whether Client
+   photo EXIF (including GPS coordinates of a customer's home) leaves the pipeline.
+5. **Regional AI-transparency law.** Meta offers an optional self-disclosure toggle for the European
+   Region, California, New York, India and Taiwan, but the underlying duty is statutory, not Meta's.
+   A UK-targeting advertiser falls inside the European Region grouping. Needs a legal answer, not a
+   platform answer.
+6. **No Meta rule was found governing stock or generated imagery presented as the advertiser's own
+   completed work.** The applicable hooks are claim-based — *"deceptive or exaggerated claims about
+   the success of a product or service"* — rather than image-provenance-based. This is an inference,
+   not a quoted rule. **It does not weaken the recommendation**, because the case against generated
+   imagery here is commercial and ethical before it is regulatory: the argument was never "Meta will
+   catch you".
+7. **Unconfirmed pricing:** exact OpenAI per-model image-output rate, first-party FLUX prices, and
+   Ideogram / Recraft pricing and text-fidelity claims.
+8. **Client photo rights, consent and EXIF.** Out of scope for this ticket and already on the map's
+   "not yet specified" list, but this research touches it: inpainting out a bystander's face or a
+   licence plate is a real privacy measure, and raw Client photos otherwise reach Meta as shot.
+
+**Resolved and no longer open:** whether commercial ads need AI disclosure (they do not — the
+mandatory regime is scoped to social-issue, electoral and political ads, which advertdreams does not
+touch); whether AI imagery itself risks rejection (it does not — *"Automated detection does not
+change ad eligibility"*); and whether construction before/after imagery is permitted (it is).
 
 ## Recommendation, in one paragraph
 
