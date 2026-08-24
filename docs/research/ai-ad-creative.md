@@ -349,3 +349,42 @@ Two design consequences worth carrying into the pipeline ticket:
    "regenerate" and waits, that is a UI decision to make deliberately — with a queued job and a
    notification, not a blocking request.
 
+## Open risks and things I could not confirm
+
+Listed so they are not quietly forgotten, roughly in order of how much they would hurt.
+
+1. **Housing Special Ad Category.** Meta publishes the enum but not a definition of what counts as a
+   housing ad. My reading is that a contractor selling services is not offering a housing
+   opportunity, but I could not find Meta text saying so. If wrong, the 15-mile / 25 km minimum
+   radius and the ban on location exclusion break local targeting for a trade that works a 10-mile
+   patch. **Confirm before the targeting model is specified.**
+2. **The 20% text-in-image rule.** Believed removed and absent from the fetchable Ads Guide spec, but
+   Meta's Business Help Center pages are JavaScript-rendered and would not yield body text to
+   automated fetching. The compositing recommendation assumes burned-in headline text carries no
+   delivery penalty. Verify by hand.
+3. **What counts as a "significant edit"** for AI labelling purposes. Meta uses the phrase and never
+   defines it. This is the boundary that decides whether outpainting a photo to 4:5 gets the ad an AI
+   label. Treat outpainting as label-triggering until proven otherwise, and prefer asking Clients to
+   shoot portrait.
+4. **Third-party AI detection in practice.** Meta says it will *"begin automatically detecting ads
+   created or edited using third-party AI tools through industry-standard signals"* — announced, but
+   with no published detail on which signals, what the false-positive rate is, or whether a composited
+   real photo could ever trip it. Worth an empirical check once the pipeline runs: publish one
+   composited creative and look at whether an AI label appears.
+5. **Client photo rights and consent.** Out of scope for this ticket and already on the map's "not yet
+   specified" list, but this research touches it: if the pipeline inpaints out a bystander's face or a
+   licence plate, that is a privacy measure with real value, and if it does not, the Client's raw
+   photos go to Meta as-is. Flagging the connection.
+
+## Recommendation, in one paragraph
+
+Use **Claude Sonnet 5** (`claude-sonnet-5`, $2/$10 per MTok) for photo triage and copy generation, via
+the **Batch API** at 50% off, with the vertical's prompt template behind a **prompt cache breakpoint**
+— roughly **2 cents per creative-set**, which is not a cost worth optimising. Composite the copy over
+the Client's real photographs with a deterministic HTML/CSS or SVG layout template stored as a
+configuration record, at **zero marginal cost and sub-second latency**. Make **before/after the default
+layout** — it is the strongest format for this vertical and Meta permits it outside health contexts.
+Reserve image *generation* for repairing the Client's own photos (aspect-ratio expansion, distraction
+removal) and never for inventing the subject or a person. This keeps the ads honest, keeps the
+agency ad account out of deceptive-content review, keeps text legible, and costs less than the
+alternative.
