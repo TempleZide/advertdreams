@@ -93,83 +93,154 @@ generating twenty copy variants and letting Meta's delivery optimisation sort th
 
 ## Image models: what the field looks like, and what it costs
 
-Surveyed honestly, because the recommendation is "mostly don't" and that only carries weight if the
+Surveyed properly, because the recommendation is "mostly don't" and that only carries weight if the
 alternative has actually been priced.
+
+### The finding that matters most: most editors have no pixel mask
+
+Before any price: the models split on a capability that decides whether they can be trusted near a
+Client's photograph at all.
+
+| Model | Edits your photo | **True pixel mask** | Outpaint | Background replace |
+|---|---|---|---|---|
+| Gemini 3 Pro Image / 3.1 Flash Image | yes, up to 14 refs | **no** — prompt only | prompt only | prompt only |
+| FLUX.2 [pro/max/flex/klein] | yes, up to 8 inputs | **no** — prompt only | — | prompt only |
+| OpenAI gpt-image-2 / 1.5 / 1 | yes | **hint only** (see below) | prompt only | prompt only |
+| **FLUX.1 Fill [pro]** | yes | **yes** | — | — |
+| **FLUX Outpainting / Erase** | yes | yes (erase) | **yes, purpose-built** | — |
+| **Stability** | yes | **yes** | **yes** | **yes** |
+| **Ideogram 3.0** | yes | **yes** (mask inverted: black = edit) | yes (`reframe`) | **yes** |
+| **Recraft V3** | yes | **yes** | **yes** | **yes** |
+| Imagen (Vertex) | yes | yes | no | yes |
+
+OpenAI's own wording on its mask parameter: *"Masking with GPT Image is entirely prompt-based. The
+model uses the mask as [guidance]."* That is a hint, not a guarantee.
+
+**Why this is load-bearing.** The one legitimate use for generation in this pipeline is editing the
+Client's real photo — expanding it to 4:5, removing a wheelie bin. Without a hard pixel mask, the
+model is free to repaint the driveway itself while it works, and you would not necessarily notice.
+That converts a defensible edit into exactly the misrepresentation this document is trying to avoid.
+
+**So: if advertdreams ever edits a Client photo, it must use a true-mask endpoint** — FLUX.1 Fill,
+Stability, Ideogram 3.0, or Recraft V3 — *not* whichever model benchmarks best. The two strongest
+models on raw quality (Gemini 3 Pro Image, FLUX.2) are the two you cannot safely point at a
+contractor's photograph. Note also that Recraft and Ideogram have dropped mask inpainting from their
+newest versions (V4/V4.1, Ideogram 4.0), so "newest" is actively wrong here.
 
 ### Pricing (verified 2026-08-23)
 
-| Model | ID | Cost per image | Takes an input image? |
+**OpenAI** — per image, from the [image generation guide](https://developers.openai.com/api/docs/guides/image-generation):
+
+| Model | Low | Medium | High (1024x1024) |
 |---|---|---|---|
-| Gemini 3.1 Flash Image ("Nano Banana 2") | `gemini-3.1-flash-image` | $0.067 @ 1K (batch $0.034) | Yes — editing via input images |
-| Gemini 3.1 Flash Lite Image | `gemini-3.1-flash-lite-image` | $0.0336 @ 1K (batch $0.0168) | Yes |
-| Gemini 3 Pro Image ("Nano Banana Pro") | `gemini-3-pro-image` | $0.134 @ 1K/2K, $0.24 @ 4K | Yes |
-| Gemini 2.5 Flash Image ("Nano Banana") | `gemini-2.5-flash-image` | $0.039 (batch $0.0195) | Yes |
-| OpenAI GPT Image | `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini` | token-priced, see below | Yes — edits endpoint with mask |
+| `gpt-image-2` | $0.006 | $0.053 | **$0.211** |
+| `gpt-image-1.5` | $0.009 | $0.034 | $0.133 |
+| `gpt-image-1` | $0.011 | $0.042 | $0.167 |
+| `gpt-image-1-mini` | $0.005 | $0.011 | $0.036 |
 
-Source: [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing),
-[OpenAI pricing](https://developers.openai.com/api/docs/pricing),
-[OpenAI image generation guide](https://developers.openai.com/api/docs/guides/image-generation).
+Edits cost more than the table implies: gpt-image-2 *"always processes image inputs at high
+fidelity"*, so reference images inflate input tokens.
 
-**Google prices generated images as output tokens**: 1120 tokens for a 1K image, 1680 for 2K, 2520
-for 4K, billed at the model's output rate. **OpenAI does the same**: a high-quality 1024x1024 costs
-4,160 image output tokens and a 1024x1536 costs 6,240, against an image-output rate the pricing page
-gives only as a range of **$8-40 per 1M tokens** depending on model. That puts a high-quality
-portrait OpenAI image somewhere between roughly **$0.05 and $0.25** — I could not pin the exact
-per-model rate, because OpenAI's page defers to an interactive calculator that does not render to
-automated fetching. **Flagged as unconfirmed.**
+**Google** ([Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing)) — `gemini-3-pro-image`
+$0.134 (1K/2K), `gemini-3.1-flash-image` $0.067 (1K), `gemini-3.1-flash-lite-image` $0.0336,
+`gemini-2.5-flash-image` $0.039. No free tier on any image model.
+Vertex Imagen 4 is $0.02-0.06/image but **its status is contested**: the Gemini API announced shutdown
+of the Imagen 4 model IDs effective **2026-08-17**, while Vertex still prices them and lists no
+deprecation. Imagen is the legacy line either way — do not design around it.
 
-**Imagen 4 is gone.** Google's pricing page lists `imagen-4.0-generate-001` and its variants as
-deprecated with a shutdown date of **2026-08-17** — six days before this research. Any prior note
-recommending Imagen is stale. This is a good illustration of why the ticket's instruction to verify
-rather than recall was the right instruction.
+**Black Forest Labs** ([pricing](https://docs.bfl.ml/quick_start/pricing.md), 1 credit = $0.01) —
+FLUX.2 [klein] 4B from $0.014 / 9B from $0.015, [pro] $0.03 text-to-image and **$0.045 editing**,
+[flex] $0.05 (*"Specialized for typography"*), [max] $0.07. FLUX.1 Kontext [pro] $0.04.
+**FLUX.1 Fill [pro] $0.05** — the mask-inpainting endpoint, and the relevant one here.
+**FLUX.2 [dev] is open-weight and non-commercial** — no hosted API, and self-hosting for a Client
+needs a separate commercial licence. Do not let that one slip into the stack by accident.
 
-Black Forest Labs' FLUX line is live and current (FLUX 3, FLUX.2, FLUX.2 Max, FLUX.2 Klein, plus the
-FLUX Tools editing models), and is the usual choice when you want in-place photo editing at low cost.
-BFL's own pricing page renders its table through JavaScript and returned only a video-pricing example
-to automated fetching, so **first-party FLUX prices are unconfirmed**. The aggregator
-[fal.ai](https://fal.ai/pricing) lists **FLUX Kontext Pro at $0.04 per image** — Kontext is the
-editing line, the one that takes your photo as input — which is the right order of magnitude and the
-practical way to access these models anyway. Confirm against BFL directly before it goes in a
-pricing model.
+**Stability** ([pricing](https://platform.stability.ai/pricing), 1 credit = $0.01) — Inpaint $0.05,
+Outpaint $0.04, Erase $0.05, Remove Background $0.05, Replace Background & Relight $0.08, generation
+$0.025-0.08.
+
+**Recraft** ([pricing](https://www.recraft.ai/docs/api-reference/pricing)) — V3 inpaint / outpaint /
+replace background / generate background **$0.04 each**; raster generate $0.035-0.04.
+
+**Ideogram** — v3 Turbo/Balanced/Quality $0.03/$0.06/$0.09 and v4 Quality $0.10 *via aggregators*
+([Replicate](https://replicate.com/ideogram-ai/ideogram-v3-quality), [fal](https://fal.ai/models/fal-ai/ideogram/v3)).
+**Ideogram's own list price is unconfirmed** — its pricing page is Cloudflare-gated and
+client-rendered.
+
+**Aggregators** ([fal](https://fal.ai/pricing), [Replicate](https://replicate.com/pricing)) — fal
+passes OpenAI through at cost, marks Google up ~12-19% (Nano Banana 2 $0.08 vs Google's $0.067), and
+undercuts BFL on klein ($0.006/MP). Cheapest viable quality in the whole survey is **FLUX.2 [klein]
+9B at ~$0.006 per 1024² via fal**.
 
 ### The order-of-magnitude conclusion
 
-Generated images land in the **$0.02-0.25 per image** band. Set against the ~2-4 cents the text model
-costs, image generation is where the per-creative cost actually lives — it is 1x to 10x the entire
-rest of the pipeline. And compositing is **$0**. Ten variants composited cost nothing; ten variants
-generated cost real money every time somebody clicks regenerate.
+Generated images span **$0.006 to $0.211** — three and a half orders of magnitude, and the top of the
+range costs 6x the entire text pipeline for a *single* image. The edit operations that matter here
+(mask inpaint, outpaint, background replace) cluster tightly at **$0.04-0.08**. Compositing is **$0**,
+and ten variants composited still cost $0.
 
 ### Text rendering: the providers say it themselves
 
-This is the part worth quoting, because it is the technical crux of the generate-vs-composite
-argument and it comes from the vendor rather than from me. OpenAI's own image generation guide, on
-its current flagship image models:
+The technical crux of generate-vs-composite, quoted from vendors rather than asserted by me. OpenAI,
+on its current flagship image models:
 
 > "Although significantly improved, the model can still struggle with precise text placement and
 > clarity."
 
-and lists **"Text Rendering"** among the known limitations of the GPT Image family.
+and, in the same known-limitations list, that it *"may occasionally struggle to maintain visual
+consistency for recurring characters or **brand elements**"* and *"may have difficulty placing
+elements precisely in structured or **layout-sensitive compositions**"*.
 
-Every static ad in this product needs a headline at a fixed character limit, usually a phone number,
-and often an accreditation mark. "Struggles with precise text placement and clarity" is
-disqualifying for a phone number. A compositor renders it in the right typeface at the right size
-with the right kerning, every time, for free — and it can be *validated*, because the text is a
-string you put there rather than pixels you have to OCR back to check.
+That is a precise description of an ad: a brand element, a layout-sensitive composition, and a phone
+number that must be correct. Google and BFL claim better ("legible, stylized text… for marketing
+assets"; FLUX.2 [flex] is *"specialized for typography"*), and Ideogram and Recraft are the two
+usually named for in-image text — Recraft even supports **custom fonts**. None of that changes the
+architecture: a compositor renders the headline in the right typeface at the right size every time,
+for free, and the result is *validatable*, because the text is a string you set rather than pixels
+you must OCR back to check.
 
-Ideogram and Recraft are the two models usually named as best-in-class for legible in-image text, and
-Recraft additionally for brand-consistent and vector output. **I did not confirm their current
-pricing or capability claims from primary sources** — flagged as a gap. It is a gap that does not
-change the recommendation, though: even a model that renders text perfectly is a slower, costlier,
-non-deterministic way to do something CSS already does exactly.
+### Output size: another quiet argument for compositing
+
+Meta's feed sizes are 1080x1080 and 1080x1350. **Ideogram is the only surveyed provider with those as
+native presets.** `gpt-image-2` requires both edges to be **multiples of 16** — 1080, 1350 and 628 are
+all invalid — so every OpenAI output needs generating oversize and resampling. Gemini has no 1.91:1
+aspect ratio at all. A compositor emits exact pixel dimensions by definition.
+
+### Licensing: two traps worth naming
+
+1. **Stability's terms are disqualifying for Client photos.** Uploading an image grants Stability a
+   *"nonexclusive, worldwide, royalty free, fully paid up, transferable, sublicensable, perpetual,
+   irrevocable license to copy, display, upload, perform, distribute, store, modify, and otherwise
+   use such materials"*, and you warrant you hold all copyright **and rights of publicity** in it.
+   These are the Client's photographs, sometimes with people in them. **Do not send Client photos to
+   Stability** — this connects directly to the map's open "Client asset management: storage, rights"
+   item.
+2. **Recraft's free tier takes ownership.** *"No commercial use of Free Tier Assets is permitted;
+   Free Tier Assets are owned by Recraft."* Paid tiers assign copyright to you. An easy and expensive
+   mistake to make during prototyping.
+
+OpenAI, BFL (hosted API only), Ideogram and Replicate all assign output rights cleanly and permit
+commercial advertising use. **fal.ai has no affirmative output-ownership assignment** in its terms —
+only a disclaimer — which is the weakest IP position in the survey and worth noting before it becomes
+the default access route.
 
 ### Watermarking and content credentials
 
-Providers embed provenance signals in generated output — C2PA content credentials, and Google's
-SynthID invisible watermarking. Google's pricing page makes no mention of SynthID, so I could not
-confirm the current per-model watermarking behaviour from that source; **treat "generated images
-carry detectable provenance" as the safe working assumption** rather than a verified per-provider
-fact. It aligns with Meta's stated intent to detect third-party AI tools *"through industry-standard
-signals"*, and it is the assumption that leads to the safer design either way.
+Every serious provider marks its output, which is what Meta's detector reads.
+
+- **Google: SynthID on all Gemini image output**, with *no documented opt-out on the Gemini API*, and
+  designed to survive *"cropping, adding filters, changing frame rates, or lossy compression"*. On
+  Vertex, Imagen exposes `addWatermark` (defaults true) and it can be disabled.
+- **OpenAI: both C2PA and SynthID** on API output. C2PA *"can sometimes be removed by platforms,
+  editing tools, or file conversions"*.
+- **Stability: C2PA signing across all APIs**, no pixel watermark — so a re-encode strips it.
+- **BFL, Ideogram, Recraft:** terms *reserve* the right to embed provenance and **prohibit removing
+  it**; what actually ships today is unconfirmed.
+
+Two conclusions. First, **"generated images carry detectable provenance" is now verified, not
+assumed** — and Google's is effectively inescapable. Second, stripping it is a terms breach at BFL,
+Ideogram and Recraft, so the option that might have made generation quietly labelling-free does not
+exist. Compositing a real photo produces no generation provenance in the first place.
 
 ## Generate vs. composite
 
@@ -235,6 +306,14 @@ Not never — but narrowly, and always *over* a real photograph rather than inst
 
 Each of these has a bright line: the finished work in the frame must be the Client's actual finished
 work. Extending the sky is fine. Extending the driveway is not.
+
+**And the bright line needs enforcing in the tooling, not just the prompt.** As the model survey
+found, most editors — including the two best ones, Gemini 3 Pro Image and FLUX.2 — have no pixel
+mask, and OpenAI's mask is explicitly only a hint. A prompt-driven editor asked to "extend the sky"
+is free to repaint the driveway on its way past. **Any edit of a Client photo must go through a
+true-mask endpoint** (FLUX.1 Fill $0.05, Stability, Ideogram 3.0, Recraft V3), with the mask covering
+only the region being changed. That is the difference between an honest edit and an undetected
+misrepresentation, and it is a tooling constraint rather than a matter of care.
 
 ### The honest counter-argument
 
@@ -490,8 +569,15 @@ Concrete budget for one composited creative:
 | Photo triage (Claude vision, one call over N photos) | a few seconds |
 | Copy generation (Claude, ~1,500 output tokens) | a few seconds |
 | Layout composition (headless Chromium or SVG compositing) | sub-second |
-| Optional outpainting to 4:5 (image model) | seconds to tens of seconds |
+| Optional outpainting to 4:5 (image model) | sub-second to ~2 minutes — see below |
 | Upload to Meta + ad review | up to 24 hours |
+
+Image-model latency is poorly documented across the industry, but two figures are first-party and
+bracket the range: OpenAI warns that *"Complex prompts may take up to 2 minutes to process"* (and
+notes JPEG is faster than PNG, square fastest), while BFL claims *"sub-second inference"* for
+FLUX.2 [klein]. Two operational limits matter more than the averages: **OpenAI Tier 1 allows only 5
+images per minute** and requires organisation verification before any GPT Image call, and **BFL result
+URLs expire after 10 minutes**, so a pipeline must download immediately rather than store the URL.
 
 Anthropic rates comparative latency as Sonnet 5 "Fast", Opus 5 "Moderate", Haiku 4.5 "Fastest"
 ([models overview](https://platform.claude.com/docs/en/about-claude/models/overview)) — another
@@ -541,11 +627,25 @@ Listed so they are not quietly forgotten, in order of how much they would hurt.
    not a quoted rule. **It does not weaken the recommendation**, because the case against generated
    imagery here is commercial and ethical before it is regulatory: the argument was never "Meta will
    catch you".
-7. **Unconfirmed pricing:** exact OpenAI per-model image-output rate, first-party FLUX prices, and
-   Ideogram / Recraft pricing and text-fidelity claims.
-8. **Client photo rights, consent and EXIF.** Out of scope for this ticket and already on the map's
+7. **Ideogram's own API list price** — its pricing page is Cloudflare-gated and client-rendered, so
+   the $0.03-0.10 figures in this document are what Replicate and fal charge, not Ideogram direct.
+   Also unconfirmed: the Advertisement Resizer endpoint's price (returned per-request), BFL's FLUX
+   Tools endpoint prices (Outpainting, Erase — absent from the pricing page), and Recraft V4/V4.1
+   image-to-image pricing.
+8. **Imagen 4's status on Vertex.** The Gemini API announced shutdown of the Imagen 4 model IDs
+   effective 2026-08-17; Vertex still prices them and lists no deprecation. Contradictory. Moot
+   unless someone reaches for Imagen, which they should not.
+9. **fal.ai output ownership.** Its terms contain a disclaimer but no affirmative assignment of
+   rights in generated output — the weakest IP position in the survey, and fal is the most convenient
+   access route, so the two pull in opposite directions.
+10. **Client photo rights, consent and EXIF.** Out of scope for this ticket and already on the map's
    "not yet specified" list, but this research touches it: inpainting out a bystander's face or a
    licence plate is a real privacy measure, and raw Client photos otherwise reach Meta as shot.
+
+**Resolved since the first pass:** exact per-image pricing for OpenAI, Google, BFL, Stability and
+Recraft (all now in the table above); that generated output does carry detectable provenance
+(verified per-provider, and Google's SynthID has no Gemini-API opt-out); and that most image editors
+have **no pixel mask**, which is now a hard tooling constraint rather than an open question.
 
 **Resolved and no longer open:** whether commercial ads need AI disclosure (they do not — the
 mandatory regime is scoped to social-issue, electoral and political ads, which advertdreams does not
