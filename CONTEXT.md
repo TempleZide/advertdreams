@@ -26,7 +26,9 @@ The information collected from a Client that everything else is generated from: 
 
 ## Creative
 
-One generated advertisement: an image or a video, plus ad copy. Multiple Creatives are generated per Service so the Client can choose and so the platform can optimise between them. Creatives are built from the Client's own media, not generated from nothing.
+One generated advertisement: ad copy plus the Client's own media, rendered for a platform. Creatives are built from the Client's photos and videos, not generated from nothing.
+
+A Creative is not a single image file. The same Creative is rendered differently per platform, because platforms disagree — Meta sets a minimum image size where TikTok sets a maximum, and TikTok requires a music track. Multiple Creatives are generated per Service so the Client can choose and so the platform can optimise between them.
 
 ## Site
 
