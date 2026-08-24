@@ -91,6 +91,83 @@ Against a Client's monthly ad spend this is noise. **The text model is not a cos
 not be optimised as one.** Note the corollary: this also means there is no cost argument against
 generating twenty copy variants and letting Meta's delivery optimisation sort them out.
 
+## Image models: what the field looks like, and what it costs
+
+Surveyed honestly, because the recommendation is "mostly don't" and that only carries weight if the
+alternative has actually been priced.
+
+### Pricing (verified 2026-08-23)
+
+| Model | ID | Cost per image | Takes an input image? |
+|---|---|---|---|
+| Gemini 3.1 Flash Image ("Nano Banana 2") | `gemini-3.1-flash-image` | $0.067 @ 1K (batch $0.034) | Yes — editing via input images |
+| Gemini 3.1 Flash Lite Image | `gemini-3.1-flash-lite-image` | $0.0336 @ 1K (batch $0.0168) | Yes |
+| Gemini 3 Pro Image ("Nano Banana Pro") | `gemini-3-pro-image` | $0.134 @ 1K/2K, $0.24 @ 4K | Yes |
+| Gemini 2.5 Flash Image ("Nano Banana") | `gemini-2.5-flash-image` | $0.039 (batch $0.0195) | Yes |
+| OpenAI GPT Image | `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini` | token-priced, see below | Yes — edits endpoint with mask |
+
+Source: [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing),
+[OpenAI pricing](https://developers.openai.com/api/docs/pricing),
+[OpenAI image generation guide](https://developers.openai.com/api/docs/guides/image-generation).
+
+**Google prices generated images as output tokens**: 1120 tokens for a 1K image, 1680 for 2K, 2520
+for 4K, billed at the model's output rate. **OpenAI does the same**: a high-quality 1024x1024 costs
+4,160 image output tokens and a 1024x1536 costs 6,240, against an image-output rate the pricing page
+gives only as a range of **$8-40 per 1M tokens** depending on model. That puts a high-quality
+portrait OpenAI image somewhere between roughly **$0.05 and $0.25** — I could not pin the exact
+per-model rate, because OpenAI's page defers to an interactive calculator that does not render to
+automated fetching. **Flagged as unconfirmed.**
+
+**Imagen 4 is gone.** Google's pricing page lists `imagen-4.0-generate-001` and its variants as
+deprecated with a shutdown date of **2026-08-17** — six days before this research. Any prior note
+recommending Imagen is stale. This is a good illustration of why the ticket's instruction to verify
+rather than recall was the right instruction.
+
+Black Forest Labs' FLUX line is live and current (FLUX 3, FLUX.2, FLUX.2 Max, FLUX.2 Klein, plus the
+FLUX Tools editing models), and is the usual choice when you want in-place photo editing at low cost,
+but **I could not extract per-image prices** — bfl.ai's pricing page renders its table through
+JavaScript and returned only a video-pricing example to automated fetching. **Flagged as
+unconfirmed**; price it by hand or via fal.ai / Replicate before relying on a number.
+
+### The order-of-magnitude conclusion
+
+Generated images land in the **$0.02-0.25 per image** band. Set against the ~2-4 cents the text model
+costs, image generation is where the per-creative cost actually lives — it is 1x to 10x the entire
+rest of the pipeline. And compositing is **$0**. Ten variants composited cost nothing; ten variants
+generated cost real money every time somebody clicks regenerate.
+
+### Text rendering: the providers say it themselves
+
+This is the part worth quoting, because it is the technical crux of the generate-vs-composite
+argument and it comes from the vendor rather than from me. OpenAI's own image generation guide, on
+its current flagship image models:
+
+> "Although significantly improved, the model can still struggle with precise text placement and
+> clarity."
+
+and lists **"Text Rendering"** among the known limitations of the GPT Image family.
+
+Every static ad in this product needs a headline at a fixed character limit, usually a phone number,
+and often an accreditation mark. "Struggles with precise text placement and clarity" is
+disqualifying for a phone number. A compositor renders it in the right typeface at the right size
+with the right kerning, every time, for free — and it can be *validated*, because the text is a
+string you put there rather than pixels you have to OCR back to check.
+
+Ideogram and Recraft are the two models usually named as best-in-class for legible in-image text, and
+Recraft additionally for brand-consistent and vector output. **I did not confirm their current
+pricing or capability claims from primary sources** — flagged as a gap. It is a gap that does not
+change the recommendation, though: even a model that renders text perfectly is a slower, costlier,
+non-deterministic way to do something CSS already does exactly.
+
+### Watermarking and content credentials
+
+Providers embed provenance signals in generated output — C2PA content credentials, and Google's
+SynthID invisible watermarking. Google's pricing page makes no mention of SynthID, so I could not
+confirm the current per-model watermarking behaviour from that source; **treat "generated images
+carry detectable provenance" as the safe working assumption** rather than a verified per-provider
+fact. It aligns with Meta's stated intent to detect third-party AI tools *"through industry-standard
+signals"*, and it is the assumption that leads to the safer design either way.
+
 ## Generate vs. composite
 
 This is the load-bearing question in the ticket, so it gets the long answer.
