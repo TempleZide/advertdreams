@@ -167,3 +167,20 @@ writeFileSync(dir + 'out/review.html', `<!doctype html><meta charset=utf-8>
 <div class=row>${Object.entries(layouts).map(([n]) => card(n, copy[n])).join('')}</div>
 `)
 console.log('out/review.html')
+
+// A single self-contained file: images inlined as data URIs, system fonts only. Opens
+// anywhere, including straight off a GitHub raw URL — nothing to unpack, no assets to lose.
+const jpeg = (name) => {
+  execFileSync('magick', [`${dir}out/${name}.png`, '-resize', '900x', '-quality', '82',
+    `${dir}out/.${name}-web.jpg`])
+  const b64 = readFileSync(`${dir}out/.${name}-web.jpg`).toString('base64')
+  execFileSync('rm', [`${dir}out/.${name}-web.jpg`])
+  return `data:image/jpeg;base64,${b64}`
+}
+
+const standalone = readFileSync(dir + 'out/review.html', 'utf8')
+  .replace(/@font-face \{[^}]*\}\n\s*/g, '')
+  .replace(/font-family: Inter, sans-serif/, "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif")
+  .replace(/src="(\w+)\.png"/g, (_, n) => `src="${jpeg(n)}"`)
+writeFileSync(dir + 'review-standalone.html', standalone)
+console.log('review-standalone.html')
