@@ -40,6 +40,11 @@ and the Business Manager API needed to provision accounts programmatically (§6)
 | Does agency-owned-vs-Client-owned change the answer? | **Yes, decisively** — see §3 |
 | Can the full publishing flow be built on the dev tier? | **Yes, against a real ad account.** Not in sandbox — see §5 |
 
+> **Scope of §1–§11: `ads_management` and `ads_read` only.** [#5](https://github.com/TempleZide/advertdreams/issues/5)
+> subsequently made Lead Ads the primary lead capture mechanism, adding **`leads_retrieval`** — which lands on the
+> *other* side of every answer above: **Advanced Access, App Review, and Business Verification are all required for
+> it.** See **§12**. Nothing in §12 disturbs §1–§11; the permission set simply splits across both axes.
+
 ---
 
 ## 2. The two axes, kept apart
@@ -428,3 +433,188 @@ mitigation 2 makes the question moot for about ten lines of code.
 - <https://developers.facebook.com/docs/marketing-api/business-asset-management/guides/ad-accounts> — ad account creation endpoint, `end_advertiser` field, 5-account cap
 - <https://developers.facebook.com/docs/marketing-api/best-practices/> — sandbox limitations
 - <https://developers.facebook.com/docs/development/maintaining-data-access/data-use-checkup/> — DUC exemption for Standard Access apps in Development mode
+
+---
+
+## 12. Addendum — `leads_retrieval` (added after [#5](https://github.com/TempleZide/advertdreams/issues/5) resolved)
+
+[#5](https://github.com/TempleZide/advertdreams/issues/5) made Lead Ads the primary lead capture mechanism, on the
+grounds that they are the only channel carrying per-lead campaign attribution. That adds `leads_retrieval` to the
+question, and it does **not** land where `ads_management` did.
+
+### 12.1 Verdict: #5 is right. App Review *is* required — for this permission only
+
+**The permission set splits across both axes.** This is the single most important correction to §1, and it does not
+disturb any of it.
+
+| Permission | Access Level | App Review | Business Verification | Works in Dev mode? |
+|---|---|---|---|---|
+| `ads_management` | **Standard** — automatic | **No** | No | Yes |
+| `ads_read` | **Standard** — automatic | **No** | No | Yes |
+| `leads_retrieval` | **Advanced** | **Yes** | **Yes** | **No** (except app-role users) |
+| `pages_manage_ads` | **Advanced** (rides along) | **Yes** — same submission | Yes | — |
+
+The Lead Ads guide states it flatly, with no owner-only carve-out:
+
+> "To retrieve lead data, your app must undergo App Review. You must include the `leads_retrieval` and
+> `pages_manage_ads` permissions in your submission."
+>
+> — <https://developers.facebook.com/docs/marketing-api/guides/lead-ads/>
+
+The same page states Business Verification follows approval. This is a **permission-specific** requirement, and it
+beats the generic exemption on the App Review overview page that §3b relied on for `ads_management`. Specific over
+general — that is why the two permissions separate.
+
+### 12.2 Why it separates: the asymmetry is real
+
+§3 turned on ownership: our portfolio **owns** the ad accounts, so `ads_management` sits in its own definition's first
+clause ("the Ads account it **owns**"). **We do not own the Pages.** The Client owns the Page, the lead form lives on
+the Page, and the lead is Page data belonging to another business. There is no ownership clause to land in.
+
+The grant chain is also longer, and every link is a separate gate:
+
+1. The Client's business shares the Page to ours as a client asset with `ADVERTISE` (ads run — §3c).
+2. **Leads Access Manager** is a *second, separate* grant on the same Page, and it is not implied by the first:
+   > "If the Page admin did not customize leads and has not granted access permission with the Leads Access Manager,
+   > then all Page admins will have leads access permission."
+   > — <https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieving>
+
+   The default is permissive, but any Client who has ever customised leads access must grant us explicitly. This
+   confirms #3's "lead access is a second gate" finding and #5's per-Client Leads Access grant.
+3. Our app must hold `leads_retrieval` at **Advanced Access**, which is where App Review enters.
+
+Reading leads needs, verbatim from the retrieval guide: "A Page or User access token requested by a person who can
+advertise on the ad account", with `ads_management`, `leads_retrieval`, `pages_show_list`, `pages_read_engagement`,
+`pages_manage_ads` for full lead-level data. Note the token type — Meta recommends a **long-lived Page token** for
+lead ads, not the system user token that carries the publishing flow. Two credential paths, not one.
+
+### 12.3 One App Review submission, not several
+
+**One submission covering `leads_retrieval` + `pages_manage_ads`.** Submissions are per-app and bundle multiple
+permissions; the guide names both in a single sentence about a single submission. Within it, "Each permission and
+feature must have its own description. Do not copy and paste."
+(<https://developers.facebook.com/docs/app-review/submission-guide>) — so two narratives and two screencast sets,
+one submission, one decision.
+
+`ads_management` and `ads_read` **stay at Standard Access and stay out of the submission.** §3 is untouched: nothing
+about needing Advanced Access for `leads_retrieval` drags the ads permissions up with it.
+
+**[unconfirmed] — the one thing that could change that.** `leads_retrieval`'s permission reference lists as
+dependencies: `Ads Management Standard Access`, `ads_management`, `ads_read`, `business_management`,
+`pages_manage_ads`, `pages_read_engagement`, `pages_show_list`
+(<https://developers.facebook.com/docs/permissions/reference/leads_retrieval>). **No Meta page states whether a
+dependency must be held at the same access level as the permission depending on it** —
+<https://developers.facebook.com/docs/permissions/> was checked specifically for this and is silent. If dependencies
+must match, the submission grows to include `ads_management`, `ads_read` and `business_management` at Advanced
+Access, and §1's "Standard is enough" becomes true only for a product without Lead Ads. **This is the highest-value
+unknown in the whole ticket.** It is also cheap to settle: open App Review → Permissions and Features in the App
+Dashboard and select `leads_retrieval`; the dashboard will either auto-select the dependencies or not. Ten minutes,
+no submission required.
+
+Note also `Ads Management Standard Access` appearing in that dependency list — the Marketing API Access Tier feature
+(§2, Axis B) is a stated dependency of `leads_retrieval`. Under the rename that reads as "Limited Access and above"
+(§4), so it is satisfied by default, but it is the one place the two axes genuinely touch.
+
+### 12.4 What the review demands, and the timeline
+
+Timeline is unchanged from §7: **"you should receive a decision within a week"**, after Business Verification (Step
+1.5, **no published SLA** — still the unbounded item). Rejection-and-resubmit loops remain unmeasured.
+
+For `leads_retrieval` (<https://developers.facebook.com/docs/permissions/reference/leads_retrieval>): "Provide
+specific examples of why your app needs to access leads for the pages that grant you access."
+
+For `pages_manage_ads` (<https://developers.facebook.com/docs/permissions/reference/pages_manage_ads>): specific
+examples of why the app creates and manages ads "on behalf of other businesses' pages", plus three screencasts —
+the complete Facebook Login showing the permission grant, ad creation in the app, and successful ad creation on the
+Page.
+
+**Here the reviewer's script and advertdreams' reality do line up**, unlike §7. The allowed usage for
+`leads_retrieval` names our exact pattern: *"For advertiser authorized CRM platforms to pull the lead data on behalf
+of the advertisers."* That is a describable, sanctioned use case with a real Client-grant story to tell. The
+screencast requirement showing "the complete Facebook login flow demonstrating permission grant" is the awkward
+part, since Clients grant Page and Leads access through Business Manager rather than a Facebook Login in our app —
+**[unconfirmed]** how a reviewer expects that demonstrated for an asset-sharing integration. Budget for at least one
+rejection cycle on that point.
+
+### 12.5 The build-plan bite: Development mode cannot read leads
+
+> "Apps in Development mode cannot retrieve leads (except for app role users testing within the same app). Live mode
+> apps retain full lead access."
+>
+> — <https://developers.facebook.com/docs/marketing-api/guides/lead-ads/>
+
+This is the practical constraint, and it is worse than the review itself. §5's answer — build everything on Limited
+Access against a real owned ad account — **holds for publishing but not for lead retrieval**.
+
+The carve-out is the way through: **"app role users testing within the same app"**. A test Page administered by an
+account holding a role on our app *can* have its leads read in Development mode. So the full flow — form creation,
+`leadgen` webhook, lead fetch, delivery — is buildable and testable pre-review against our own test Page. What is
+**not** possible before Advanced Access is reading leads from a **real Client's** Page. That is exactly the boundary
+App Review exists to police.
+
+**Consequence: going Live is mandatory for Lead Ads, and it is not free.** §10's inherited open question about Live
+mode is now settled from the lead-ads side — Live is required regardless of what it does for creative creation. And:
+
+> "Data Use Checkup is not required for developers whose apps have Standard Access to permissions and features."
+>
+> "developers do not need to complete DUC while the app is in Development mode, but will need to complete DUC before
+> the app can be switched to Live mode"
+>
+> — <https://developers.facebook.com/docs/development/maintaining-data-access/data-use-checkup/>
+
+DUC is required for apps "published live with a use case, or [with] advanced access to permissions or features".
+Lead Ads puts advertdreams in **both** categories. The Standard-Access exemption §7 quietly relied on is forfeited
+the moment Lead Ads ship. **Budget an annual Data Use Checkup as a permanent operating cost**, and expect the
+[Data Protection Assessment](https://developers.facebook.com/docs/development/maintaining-data-access/data-protection-assessment/)
+question to become live rather than hypothetical, since we would then be handling another business's customer PII.
+
+### 12.6 Policy 10.4 and the keep-alive: does it cover `leads_retrieval`?
+
+**No — and this is the part most likely to be got wrong.** The keep-alive from §8 protects the wrong axis.
+
+Policy 10.4 reads *"Standard and Advanced **Ads API access** may be downgraded to Development access after 30 days
+of non-use"* (<https://developers.facebook.com/devpolicy/>). Under the rename (§2) that is unambiguously **Axis B**,
+the Marketing API Access Tier. `leads_retrieval` is an Axis A permission. **10.4 does not name it, and no page
+applies 10.4 to permission Access Levels.**
+
+One indirect exposure: `Ads Management Standard Access` is a listed dependency of `leads_retrieval` (§12.3), so a
+tier downgrade could plausibly disturb it. **[unconfirmed]** — no page describes that interaction. The §8 keep-alive
+already prevents the tier downgrade, so this stays theoretical.
+
+**What actually threatens Advanced Access is a different mechanism entirely:** the annual Data Use Checkup, which
+Advanced Access makes mandatory (§12.5), and which is a *deadline* rather than a usage floor. Missing it risks
+platform access. **[unconfirmed]** — no page states a permission is revoked for inactivity the way 10.4 does for the
+tier; <https://developers.facebook.com/docs/development/maintaining-data-access/data-use-checkup/> was checked
+specifically for one.
+
+**Two maintenance obligations, two mechanisms, one of them a calendar item:**
+
+| Axis | What decays | Trigger | Mitigation |
+|---|---|---|---|
+| B — Marketing API Access Tier | Full → dev tier | 30 days non-use (§10.4); maintenance bar is 500 calls / 15 days | Cron'd keep-alive read, ~35 calls/day (§8) |
+| A — `leads_retrieval` Advanced Access | Platform access | **Annual DUC deadline**, notification-driven | Calendar reminder + monitored app-admin contact address |
+
+A keep-alive cannot answer a questionnaire. **The app admin contact email must be one a solo builder actually
+reads** — a missed DUC notification is a silent, product-ending failure, and it is the same failure mode #5 called a
+single point of failure.
+
+### 12.7 What this changes about provisioning
+
+1. **App Review is back on, on a schedule, for one permission.** It gates *lead delivery from real Clients*, not
+   publishing. Publishing (§1–§7) still needs nothing.
+2. **It is not a blocker to starting.** The submission requires ≥1 successful call per requested permission within
+   30 days of submitting, so it *cannot* be filed until the lead flow works against a test Page. Build first,
+   submit second — the order is forced, not chosen.
+3. **Business Verification moves back onto the critical path**, having been taken off it in §1. It is the
+   unbounded item, so start it early even though nothing else waits on it.
+4. **#5's fallback is now load-bearing.** #5 built the landing page first precisely because it has no approval gate.
+   That sequencing is correct and should not be relitigated: it means a refused or delayed `leads_retrieval` review
+   costs attribution quality, not the product.
+
+### 12.8 Additional sources for this addendum
+
+- <https://developers.facebook.com/docs/marketing-api/guides/lead-ads/> — "your app must undergo App Review", Business Verification, Development-mode lead restriction
+- <https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieving> — token type and permissions for lead-level vs ad-level data, Leads Access Manager default
+- <https://developers.facebook.com/docs/permissions/reference/leads_retrieval> — description, allowed usage ("advertiser authorized CRM platforms"), dependency list, review ask
+- <https://developers.facebook.com/docs/permissions/reference/pages_manage_ads> — description, dependencies, three screencasts
+- <https://developers.facebook.com/docs/permissions/> — checked for dependency/access-level matching rule; silent
