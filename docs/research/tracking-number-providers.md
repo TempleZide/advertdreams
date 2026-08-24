@@ -10,7 +10,9 @@ Research for [#6](https://github.com/TempleZide/advertdreams/issues/6). Prices v
 
 The decisive finding is that **the telephony is not the cost**. Raw Twilio usage for a busy small contractor is under $4/month. The cost that matters is **A2P 10DLC registration, which in the ISV/reseller model appears to be per-Client rather than per-platform**: roughly $20 one-time plus $1.50–$10/month for *every* Client, and a registration step that gates onboarding by hours to days. That single line item is larger than all the calls and texts combined, and it is the number that belongs in the pricing model as a hard floor.
 
-CallRail and the other call-tracking specialists are priced as a finished product sold to an end business, not as an input to a SaaS reselling numbers. They cost 1.3–1.6x Twilio for advertdreams' volume profile, the gap widening as call volume rises, and the product surface they charge for (dashboard, attribution, reporting) is largely redundant — advertdreams owns its own `Lead` and `Campaign` model per [#10](https://github.com/TempleZide/advertdreams/issues/10) regardless. CallRail also has a **hard blocker**: no publicly documented API for provisioning a tracking number by area code (see below).
+CallRail and the other call-tracking specialists are priced as a finished product sold to an end business, not as an input to a SaaS reselling numbers. They cost 1.3–1.6x Twilio for advertdreams' volume profile, the gap widening as call volume rises, and the product surface they charge for (dashboard, attribution, reporting) is largely redundant — advertdreams owns its own `Lead` and `Campaign` model per [#10](https://github.com/TempleZide/advertdreams/issues/10) regardless.
+
+**Plivo is genuinely cheaper than Twilio** on telephony — about **$1.70/Client/month less** — and is a legitimate alternative rather than a rounding error at scale. It does not flip the recommendation, because the saving is ~20% of a per-Client cost whose larger half is registry fees that Plivo charges too. See *Alternatives* below for the numbers and the crossover point.
 
 ---
 
@@ -84,25 +86,44 @@ Note that CallRail's included allowances are per *account*, not per Client, so t
 | MMS out / in | $0.022 / $0.0165 (+$0.01 carrier) | not separately published — **unconfirmed** |
 | Call recording | $0.0025/min + $0.0005/min/mo storage | included in plan |
 | Transcription | $0.05/min | included on higher tiers |
-| Real-time inbound-call webhook | Yes, synchronous HTTP on call arrival | Yes, post-call webhook |
+| Real-time inbound-call webhook | Yes, synchronous HTTP on call arrival | Yes — but use **Pre-Call** or **Call Routing Complete**; the Post-Call webhook has no real-time expectation and can lag up to **20 minutes** while recording/transcription finish |
 | Real-time inbound-SMS webhook | Yes, synchronous HTTP on message receipt | Yes, "Text Message Received" webhook |
 | Call outcome + duration to the webhook | Yes — `<Dial>` `action` returns `DialCallStatus`, `DialCallDuration`, `DialCallSid`, `DialBridged` | Yes, in post-call payload |
-| **Provision by area code via API** | **Yes** — `AvailablePhoneNumbers Local` takes an `AreaCode` parameter | **Not documented** — see blocker below |
+| **Provision by area code via API** | **Yes** — `AvailablePhoneNumbers Local` takes an `AreaCode` parameter | **Yes** — pass `{"area_code": "303"}` when creating a tracker; request-and-assign, no separate search endpoint, fails cleanly rather than substituting another area code |
 | Minimum spend / commitment | None; pure pay-as-you-go | $50/mo floor; annual plans ~10% cheaper |
 
 Twilio sources: [US voice pricing](https://www.twilio.com/en-us/voice/pricing/us), [US SMS pricing](https://www.twilio.com/en-us/sms/pricing/us) (carrier fees confirmed on this page: AT&T $0.0035, T-Mobile $0.0045, Verizon $0.0045, US Cellular $0.005, other $0.004 for long-code outbound SMS; $0.01 for long-code outbound MMS; plus a $0.001 failed-message processing fee), [TwiML request parameters](https://www.twilio.com/docs/voice/twiml#request-parameters), [messaging webhook guide](https://www.twilio.com/docs/messaging/guides/webhook-request), [`<Dial>` verb](https://www.twilio.com/docs/voice/twiml/dial), [AvailablePhoneNumberLocal resource](https://www.twilio.com/docs/phone-numbers/api/availablephonenumberlocal-resource).
 
-### The CallRail blocker
+### CallRail notes
 
-CallRail's public API documentation ([apidocs.callrail.com](https://apidocs.callrail.com/)) documents Calls, Accounts, Companies, Users, Text Messages and webhooks, but **surfaces no `POST` endpoint for creating a tracker / provisioning a new tracking number, and no area-code search parameter**. advertdreams needs to auto-provision a number in the Client's local area code at onboarding; if that has to be done by hand in a dashboard, onboarding stops being automatable.
+CallRail is technically capable — it is rejected on price and fit, not capability.
 
-**Unconfirmed:** the Trackers section of CallRail's docs was truncated on fetch, so I cannot state definitively that no such endpoint exists — only that it is not publicly documented where it would be expected. If CallRail is seriously reconsidered, this is the first question to put to their sales engineering, and a "no" should end the conversation.
+- **Area-code provisioning works.** Pass `{"area_code": "303"}` when creating a tracker via the API. It is request-and-assign with no separate search endpoint, and it fails cleanly when no inventory exists in that area code rather than silently substituting a different one. That last behaviour is actually desirable: a Client must never be handed a number from the wrong area code.
+- **Use the right webhook.** CallRail's **Post-Call** webhook explicitly carries *no expectation of real-time delivery and may lag up to 20 minutes* while recording and transcription complete. For real-time `Lead` creation, use **Pre-Call** or **Call Routing Complete** instead. This is an easy trap to fall into, since "post-call" sounds like the obvious choice for logging a completed call.
+- **10DLC is not fully handled for you** — AI pre-fills a form, a human reviews and submits it, EIN entry is always manual, 3–5 business days typical. CallRail charges **$1.50/month per registered campaign**. There is a real architecture choice here: one agency-wide registration shares a low daily send cap and liability across all Clients, versus a separate CallRail account per Client for better deliverability at $1.50/month each.
+- **The real agency price is not public.** CallRail's white-label page advertises no setup fee, no contracts and unlimited company accounts but is sales-gated. Third-party blogs cite ~$147/month — **treat as rumour, unverified.** CallRail's own agency pricing estimator also shows a "Starter $55/mo" tier that does not appear on the main pricing page; the discrepancy could not be reconciled.
 
-### Providers not evaluated in depth
+### Alternatives, verified
 
-Telnyx, Bandwidth, Plivo and SignalWire are the credible CPaaS alternatives to Twilio and all offer the same primitives (local numbers by area code, programmable voice/SMS webhooks, recording) at broadly similar or slightly lower per-unit rates. **Their current pricing was not verified in this research** and is deliberately not quoted here. They are worth a look only if Twilio's rates move materially, because the switching decision would be a per-unit-price decision on an already-small line item — the 10DLC cost below dominates regardless of which CPaaS is chosen, and it is charged by the registry, not the provider.
+Twilio is the recommendation, but it is not the cheapest. These were checked live on 2026-08-23.
 
-CallTrackingMetrics, WhatConverts, Retreaver, Ringba, Nimbata and PhoneWagon were not evaluated: they sit in the same "finished product for an end business" category as CallRail and share its structural mismatch with advertdreams' needs.
+| | US local number/mo | Combined forwarded minute | SMS out | Recording | 10DLC help | Base fee |
+|---|---|---|---|---|---|---|
+| **Twilio** | $1.15 | $0.0225 | $0.0083 + $0.0045 | $0.0025/min + storage | Self-serve (Trust Hub) | $0 |
+| **Plivo** | **$0.50** | **$0.017** ($0.0055 in + $0.0115 out) | $0.0077 + $0.0025–$0.005 | listed $0.0000/min | Self-serve | $0 |
+| **Telnyx** | $1.00 | ~$0.004 + SIP trunking fees (*unconfirmed total*) | $0.004 + carrier fee | $0.002/min, $0 storage | Self-serve, best ISV/reseller docs | $0 |
+| **SignalWire** | *unconfirmed* | ~$0.0146 (*rate card unconfirmed*) | *unconfirmed* | metered, rate *unconfirmed* | **Registered CSP, actively helps register** — $4/brand | $0 (+$5 to leave trial) |
+| **CallTrackingMetrics** | $2.00 | $0.035–$0.045 | *unconfirmed* | included | Self-serve Trust Center | $79–$1,999/mo |
+
+**Plivo is the one worth taking seriously.** At the typical-month volume its telephony subtotal is ~$2.17 against Twilio's $3.86 — **~$1.70/Client/month cheaper**, about 20% of the all-in per-Client cost. That is real but not decisive: the larger half of the per-Client cost is registry fees Plivo charges too, and Twilio's documentation, ecosystem and support are worth more than $1.70/Client to a solo builder. The crossover is volume: at 100 Clients the gap is ~$170/month, at which point re-running this comparison is worth an afternoon.
+
+**Telnyx** has the clearest ISV/reseller 10DLC documentation of any provider surveyed, which matters given the per-Client brand question below. Its headline per-minute rates are the lowest quoted, but they are stated "plus applicable SIP trunking fees" and the stacked total could not be confirmed — the headline is not the price.
+
+**SignalWire** is the only provider that is itself a registered Campaign Service Provider and actively helps with 10DLC registration ($4 per brand submission). If per-Client registration turns out to be the real onboarding bottleneck, that is worth revisiting. Its pricing page renders rates in client-side JavaScript, so its core numbers could not be read; a browser session would be needed to pin them down.
+
+**CallTrackingMetrics** is the most credible turnkey alternative to CallRail if built-in agency tooling (sub-accounts, client markup pricing, client signup pages) is ever wanted instead of building it. Reseller features unlock at Marketing Pro (~$149–179/month) plus $65/domain for white-label, on top of $2/number and ~$0.04/minute.
+
+**Dropped, with reasons:** Bandwidth (sales-quote-gated, enterprise orientation, no self-serve); Ringba ($147+/month floor, built for pay-per-call affiliate routing — wrong shape); Retreaver (no public pricing, pay-per-call marketplace); WhatConverts (agency tier from $500/month); Nimbata (bills per answered call rather than per minute — different unit economics, worth a look only if call durations turn out long); PhoneWagon (**domain unreachable / DNS failure on 2026-08-23** — cannot recommend a vendor that may no longer exist).
 
 ---
 
@@ -186,5 +207,6 @@ The FCC's 2023 **one-to-one consent rule was vacated** by the 11th Circuit in *I
 - **Whether 10DLC really requires a brand per Client, or whether advertdreams can register one platform brand, is worth confirming with Twilio directly.** A platform-wide brand would cut the per-Client recurring cost by roughly half and remove the onboarding delay entirely. The ISV guidance says per-Client; getting a definitive answer from Twilio is high-value.
 - **B-attestation spam-labelling on forwarded calls is a lead-delivery risk** with no clean fix. Worth measuring in the first live Client rather than assuming.
 - **Average call duration is a guess.** The whole per-minute component scales with it. Instrument it on the first Clients and revise.
-- **CallRail's programmatic number provisioning could not be confirmed either way.** If CallRail is ever revisited, ask them first.
+- **Plivo is ~20% cheaper and the decision should be revisited at scale.** At 100 Clients the difference is ~$170/month. The recommendation rests on Twilio's ecosystem being worth more than $1.70/Client to a solo builder, which stops being true at some point.
+- **Several competitor figures could not be confirmed**: Telnyx's stacked SIP trunking fee (so its headline per-minute rate is not its real price), SignalWire's local-number and SMS rates (JavaScript-rendered pricing page), CallTrackingMetrics' per-SMS rate, and CallRail's real agency price. None of these change the recommendation, but none should be quoted as fact.
 - **Carrier SMS fees changed in January 2026 (T-Mobile)** and will change again. The carrier-fee figures here were read live from Twilio's pricing page on 2026-08-23 but should be re-read annually.
