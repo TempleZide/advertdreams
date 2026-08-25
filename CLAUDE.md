@@ -1,21 +1,17 @@
 # advertdreams
 
-## Agent skills
+Read [`AGENTS.md`](AGENTS.md) first. It holds the working instructions for every agent: the wayfinder map, the ticket types, the vocabulary, the research already done, and the prose rules.
 
-### Issue tracker
+What follows is Claude-specific wiring only.
 
-Issues live in this repo's GitHub Issues, driven through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+## Skill files
 
-### Triage labels
+The mattpocock engineering skills read three files in `docs/agents/`. They are byte-identical copies of the upstream templates, so re-sync them rather than editing them.
 
-The five canonical triage roles, each label string equal to its name. See `docs/agents/triage-labels.md`.
+- Issue tracker: GitHub Issues through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+- Triage labels: the five canonical roles, each label string equal to its name. See `docs/agents/triage-labels.md`.
+- Domain docs: single-context, so `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
 
-### Domain docs
+## Prose style
 
-Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
-
-### Prose style
-
-Everything written into this repo, including issue and pull request bodies, goes through the `unslop` skill in `.claude/skills/unslop/`. It always applies.
-
-Two exemptions. Quoted source text is never edited, even when it breaks a rule. The files in `docs/agents/` are byte-identical copies of the mattpocock skill templates and their wording is what those skills read, so leave them alone and re-sync them from upstream instead.
+The `unslop` skill in `.claude/skills/unslop/` always applies, to issue and pull request bodies as much as to documents. `AGENTS.md` states the policy and the two exemptions.

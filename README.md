@@ -75,6 +75,7 @@ advertdreams funds the ad spend out of its own ad account and recovers it in the
 | The open questions and everything settled so far | [Issue #2, the wayfinder map](https://github.com/TempleZide/advertdreams/issues/2) |
 | Research findings behind the settled decisions | [`docs/research/`](docs/research/) |
 | Recorded architecture decisions | [`docs/adr/`](docs/adr/) |
-| How agents should work in this repo | [`docs/agents/`](docs/agents/), [`CLAUDE.md`](CLAUDE.md) |
+| The generated ad creatives, and the splash page | branches [`prototype/ad-creative`](https://github.com/TempleZide/advertdreams/tree/prototype/ad-creative/prototypes/ad-creative) and [`prototype/splash`](https://github.com/TempleZide/advertdreams/tree/prototype/splash/prototypes/splash) |
+| How agents should work in this repo | [`AGENTS.md`](AGENTS.md) |
 
 **Start with the map.** Issue #2 holds the standing constraints, one line per resolved question, and what is deliberately still open. Four plausible ideas are already ruled out or deferred there: per-lead pricing, a multi-page website builder, TikTok at launch, and Client-funded ad spend. Read its Notes before proposing anything.
