@@ -1,8 +1,8 @@
 # Context
 
-Glossary for advertdreams. Terms only — no implementation detail, no decisions. Decisions live in `docs/adr/` and on the wayfinder map.
+Glossary for advertdreams. Terms only. No implementation detail, no decisions. Decisions live in `docs/adr/` and on the wayfinder map.
 
-These are the terms advertdreams owns. Vocabulary belonging to Meta, to telephony, and to the advertising trade — App Review, business portfolio, instant form, CPL, A2P 10DLC — is decoded in [`docs/jargon.md`](docs/jargon.md). Where the two collide, this file wins.
+These are the terms advertdreams owns. Vocabulary belonging to Meta, to telephony and to the advertising trade is decoded in [`docs/jargon.md`](docs/jargon.md), which covers App Review, business portfolio, instant form, CPL and A2P 10DLC. Where the two collide, this file wins.
 
 ## Client
 
@@ -12,35 +12,35 @@ A business that pays advertdreams a subscription. Small business or independent 
 
 A potential customer of the Client, captured by advertdreams and handed to the Client. A Lead originates from one of the Client's Campaigns and arrives by instant-form submission, by a form on the Client's Site, or by phone call or SMS to a Tracking Number.
 
-Not every inbound contact is a Lead: what qualifies (wrong numbers, spam, repeat callers) is an open decision, not settled here.
+Not every inbound contact is a Lead. What qualifies (wrong numbers, spam, repeat callers) is an open decision, not settled here.
 
 ## Vertical
 
-A category of business that shares intake questions, service vocabulary, and creative patterns — for example civil construction, hair salons, photographers. A Vertical is data, not code: adding one means adding a record, not a module. Civil construction is the only Vertical at launch.
+A category of business that shares intake questions, service vocabulary and creative patterns. Civil construction, hair salons and photographers are each a Vertical. A Vertical is data, not code. Adding one means adding a record, not a module. Civil construction is the only Vertical at launch.
 
 ## Service
 
-A specific job a Client sells, drawn from their Vertical's vocabulary — "stump removal", "land clearing", "driveway grading". Ads are generated per Service, not per Client in the abstract.
+A specific job a Client sells, drawn from their Vertical's vocabulary: "stump removal", "land clearing", "driveway grading". Ads are generated per Service, not per Client in the abstract.
 
 ## Intake
 
-The information collected from a Client that everything else is generated from: their Services, service area, photos, budget, and contact routing. Intake questions are defined by the Vertical.
+The information collected from a Client that everything else is generated from: their Services, service area, photos, budget and contact routing. Intake questions are defined by the Vertical.
 
 ## Creative
 
 One generated advertisement: ad copy plus the Client's own media, rendered for a platform. Creatives are built from the Client's photos and videos, not generated from nothing.
 
-A Creative is not a single image file. The same Creative is rendered differently per platform, because platforms disagree — Meta sets a minimum image size where TikTok sets a maximum, and TikTok requires a music track. Multiple Creatives are generated per Service so the Client can choose and so the platform can optimise between them.
+A Creative is not a single image file. The same Creative is rendered differently per platform, because platforms disagree. Meta sets a minimum image size where TikTok sets a maximum, and TikTok requires a music track. Multiple Creatives are generated per Service so the Client can choose and so the platform can optimise between them.
 
 ## Site
 
-The web presence advertdreams hosts for a Client — where their ads send people, and where a Lead can fill in a form. Chosen by the Client from a small set of ready-made styles and filled with their own Services, service area, and media.
+The web presence advertdreams hosts for a Client. Their ads send people there, and a Lead can fill in a form there. The Client chooses it from a small set of ready-made styles, and it is filled with their own Services, service area and media.
 
-Deliberately not called a "page": the Client also has a Facebook Page, which is a different thing owned by a different party.
+Deliberately not called a "page". The Client also has a Facebook Page, which is a different thing owned by a different party.
 
 ## Campaign
 
-A Client's advertising activity on an ad platform for a set of Services — the targeting, the budget, and the Creatives running against it. A Campaign is what spends money and what a Lead is attributed to.
+A Client's advertising activity on an ad platform for a set of Services. It holds the targeting, the budget and the Creatives running against it. A Campaign is what spends money and what a Lead is attributed to.
 
 ## Tier
 
