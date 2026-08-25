@@ -176,10 +176,10 @@ and undercuts BFL on klein ($0.006/MP). Cheapest viable quality in the whole sur
 
 ### The order-of-magnitude conclusion
 
-Generated images span **$0.006 to $0.211**, three and a half orders of magnitude, and the top of
-the range costs 6x the entire text pipeline for a *single* image. The edit operations that matter
-here (mask inpaint, outpaint, background replace) cluster tightly at **$0.04-0.08**. Compositing
-is **$0**, and ten variants composited still cost $0.
+Generated images span **$0.006 to $0.211**, three and a half orders of magnitude **[recheck, open
+risk 11]**, and the top of the range costs 6x the entire text pipeline for a *single* image. The
+edit operations that matter here (mask inpaint, outpaint, background replace) cluster tightly at
+**$0.04-0.08**. Compositing is **$0**, and ten variants composited still cost $0.
 
 ### Text rendering: the providers say it themselves
 
@@ -647,9 +647,16 @@ Listed so they are not quietly forgotten, in order of how much they would hurt.
 9. **fal.ai output ownership.** Its terms contain a disclaimer but no affirmative assignment of
    rights in generated output, the weakest IP position in the survey, and fal is the most
    convenient access route, so the two pull in opposite directions.
-10. **Client photo rights, consent and EXIF.** Out of scope for this ticket and already on the map's
-   "not yet specified" list, but this research touches it: inpainting out a bystander's face or a
-   licence plate is a real privacy measure, and raw Client photos otherwise reach Meta as shot.
+10. **Client photo rights, consent and EXIF.** Out of scope for this ticket and already on the
+   map's "not yet specified" list, but this research touches it: inpainting out a bystander's face
+   or a licence plate is a real privacy measure, and raw Client photos otherwise reach Meta as
+   shot.
+11. **The "three and a half orders of magnitude" spread.** $0.006 to $0.211 is a ratio of about
+    35, which is one and a half orders of magnitude, not three and a half. Either the arithmetic
+    is wrong or the range it was computed over is not the one now printed. Recheck it against the
+    price table before quoting the spread anywhere, and correct whichever half is wrong. Nothing
+    the section concludes rests on it, since the cost argument runs on the $0.04-0.08 edit cluster
+    and the $0 compositing line.
 
 **Resolved since the first pass:** exact per-image pricing for OpenAI, Google, BFL, Stability and
 Recraft (all now in the table above); that generated output does carry detectable provenance
