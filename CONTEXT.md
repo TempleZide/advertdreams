@@ -2,6 +2,8 @@
 
 Glossary for advertdreams. Terms only — no implementation detail, no decisions. Decisions live in `docs/adr/` and on the wayfinder map.
 
+These are the terms advertdreams owns. Vocabulary belonging to Meta, to telephony, and to the advertising trade — App Review, business portfolio, instant form, CPL, A2P 10DLC — is decoded in [`docs/jargon.md`](docs/jargon.md). Where the two collide, this file wins.
+
 ## Client
 
 A business that pays advertdreams a subscription. Small business or independent owner. The first Clients are civil construction businesses. A Client is the paying entity; the person who logs in and uploads photos is a **Client Owner** where the distinction matters.

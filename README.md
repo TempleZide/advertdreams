@@ -71,6 +71,7 @@ Three ways a Lead arrives, and they are not interchangeable. Meta's instant form
 | What | Where |
 |---|---|
 | Vocabulary — what a Client, Lead, Creative, Site, Tier actually mean | [`CONTEXT.md`](CONTEXT.md) |
+| Advertising and Meta jargon — CPL, App Review, instant form, A2P 10DLC | [`docs/jargon.md`](docs/jargon.md) |
 | The open questions and everything settled so far | [Issue #2, the wayfinder map](https://github.com/TempleZide/advertdreams/issues/2) |
 | Research findings behind the settled decisions | [`docs/research/`](docs/research/) |
 | Recorded architecture decisions | [`docs/adr/`](docs/adr/) |
