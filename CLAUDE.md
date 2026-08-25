@@ -13,3 +13,7 @@ The five canonical triage roles, each label string equal to its name. See `docs/
 ### Domain docs
 
 Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Prose style
+
+Everything written into this repo, including issue and pull request bodies, goes through the `unslop` skill in `.claude/skills/unslop/`. It always applies.
