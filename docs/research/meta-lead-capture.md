@@ -392,7 +392,7 @@ A great deal of "benchmark" content in this space is SEO content-mill output. It
 current edition, see
 [wordstream.com](https://www.wordstream.com/blog/facebook-ads-benchmarks-2025), [localiq.com
 mirror](https://localiq.com/blog/facebook-advertising-benchmarks/). Sample: 726 US Leads-objective
-campaigns, Apr 2024–Jun 2025, ~20 managed accounts.
+campaigns, Apr 2024–Jun 2025, ~20 managed accounts. **Caveat added by [#29](https://github.com/TempleZide/advertdreams/issues/29):** WordStream requires only "at minimum 2 unique active campaigns" per subcategory and reports medians, so the Home & Home Improvement row may rest on as few as two campaigns. Construction-specific comparison: Superads gives **$50.86** (13-month median, Jul 2025-Jul 2026).
 
 - **Home & Home Improvement, Leads objective: CPL $41.26**, CPC $2.23, CTR 1.94%, CVR 5.22%
   (CVR down 36% YoY)

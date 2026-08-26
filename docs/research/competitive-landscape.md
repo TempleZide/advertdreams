@@ -193,7 +193,7 @@ Industry convention is 15–20% of spend, sliding to 20–25% below $5K/mo `[3P]
 | Personal Services | $7.17 | 12.34% | $54.60 |
 | All industries | $5.42 | 8.18% | $66.69 |
 
-**Meta — WordStream/LocalIQ** (726 US lead campaigns, April 2024–June 2025, medians) `[B]`:
+**Meta — WordStream/LocalIQ** (726 US lead campaigns, April 2024–June 2025, medians) `[B]`. **Caveat added by [#29](https://github.com/TempleZide/advertdreams/issues/29):** 726 is the whole-report sample. WordStream's stated method requires only "at minimum 2 unique active campaigns" per subcategory, so any single row below may rest on as few as two campaigns.
 
 | Industry | CPC | CVR | **CPL** |
 |---|---|---|---|
@@ -204,7 +204,7 @@ Industry convention is 15–20% of spend, sliding to 20–25% below $5K/mo `[3P]
 
 Note the inversion: beauty costs *more* per lead than home improvement on Meta ($51.42 against $41.26) but far *less* on Google ($39.25 against $90.92).
 
-**Google Local Services Ads** (888 contractors, 1,774 campaigns, $6.72M of spend, February 2026) `[3P, methodology stated]`: a blended **$53 CPL, 43.9% book rate, $1,826 average ticket, 7.84x ROAS**, and $233 cost per paying customer ([Searchlight Digital](https://searchlightdigital.io/google-local-service-ads-cost-per-lead/)).
+**Google Local Services Ads** (888 contractors, 1,774 campaigns, $6.72M of spend, February 2026) `[3P, methodology stated]`: a blended **$53 CPL, 43.9% book rate, $1,826 average ticket, 7.84x ROAS**, and $233 cost per paying customer ([Searchlight Digital](https://searchlightdigital.io/google-local-service-ads-cost-per-lead/)). **UNCONFIRMED, downgraded by [#29](https://github.com/TempleZide/advertdreams/issues/29):** the study originates with The Media Captain, whose site returns 403, and searchlightdigital.io is a republisher flagged as AI-generated marketing content. For scale, LocaliQ's verified Google *search* CPL for Construction & Contractors is **$165.67** across 3,211 campaigns.
 
 **Two data-quality warnings.** LocalIQ's "Home Services Advertising Benchmarks" page carries a February 2026 publication date but is built on May 2020–June 2021 data; its social CPLs are five years stale and should not be cited. And **no CPL benchmark exists anywhere for excavation, grading or site work specifically**, on any platform. Every "construction CPL" figure in circulation is a blog extrapolation. **UNVERIFIED.**
 
@@ -266,7 +266,7 @@ The answer is decisive in both directions. Email, SMS, reviews, automated win-ba
 - **Cheap self-serve website plus some ads:** GoDaddy and Wix. GoDaddy is the only one that will sell a mom-and-pop a human running their Meta ads, and its weakness is that the price is behind a phone call.
 - **Human-managed bundle at $600–$2,700/mo:** Hibu, Scorpion, LocalIQ, Townsquare Interactive, Broadly, Marketing 360. Sold door to door and by cold call. Broadly is the only one with a published price and genuinely no contract.
 - **SMB software with a marketing wrapper:** Thryv (dying — Marketing Services down 27%, shutting by 2028), Podium (messaging, not ads), GoSite, Signpost.
-- **Lead supply for contractors:** Angi (advertising product killed, effective lead price up 47% to $40.57, pros down 19%), Thumbtack, Networx, Google LSA. **Google LSA is the best product in this category** at $53 CPL and 7.84x ROAS, and it is neither an agency nor something that can be resold.
+- **Lead supply for contractors:** Angi (advertising product killed, effective lead price up 47% to $40.57, pros down 19%), Thumbtack, Networx, Google LSA. **Google LSA is the best product in this category** at a claimed $53 CPL and 7.84x ROAS (**unconfirmed, see #29**), and it is neither an agency nor something that can be resold.
 - **The salon relationship:** GlossGenius, Booksy, Vagaro, StyleSeat, Fresha, Square — at $24–$35 per month, already holding the customer's calendar, payments and phone.
 - **The technical infrastructure advertdreams would be rebuilding:** Tiger Pistol and Evocalize, both badged Meta partners with TikTok publishing, both already automating local ad account connection at scale — for brands and franchises, not individual SMBs.
 - **The white-label shortcut anyone can buy:** Vendasta at $99–$999/mo, and Plai's Agency tier at **$297/mo with white-label on a custom domain and a SaaS client billing configurator**. Someone could stand up a competitor to advertdreams on Plai this week for $297 per month.
@@ -290,7 +290,7 @@ The answer is decisive in both directions. Email, SMS, reviews, automated win-ba
 
 ### Where this pushes back on the concept as scoped
 
-- **TikTok is the wrong second channel for these two verticals right now.** SMB adoption fell from 34% to 22%, the budget floor is $620 per ad group per month, and no published local-salon TikTok CPL benchmark exists. It is a 2027 feature, not a v1 pillar. **Meta plus Google Local Services Ads is the pairing the data supports** — LSA is where excavating contractors actually get work, at $53 per lead and 7.84x ROAS.
+- **TikTok is the wrong second channel for these two verticals right now.** SMB adoption fell from 34% to 22%, the budget floor is $620 per ad group per month, and no published local-salon TikTok CPL benchmark exists. It is a 2027 feature, not a v1 pillar. **Meta plus Google Local Services Ads is the pairing the data supports** — LSA is where excavating contractors actually get work, at a claimed $53 per lead and 7.84x ROAS (**unconfirmed, see #29**; LocaliQ's verified Google search CPL for this trade is $165.67).
 - **Excavating contractors may not be a social-ads business at all.** Their channel mix is referrals, Google Maps and LSA. The one published rate card for the trade is Networx at $57–$63 per exclusive excavation lead. Building a Meta and TikTok product for them means fighting the channel as well as the competitors.
 - **Two verticals with nothing in common is two products.** A salon needs bookings from a $150/mo budget with a $100 ticket and lives inside GlossGenius. An excavator needs $1,000 or more per month to escape Meta's learning phase, has a $5,000-plus ticket, and lives in Google LSA. Different creative, different channel, different economics, different integration surface, different sales motion. Pick one.
 - **Customer acquisition is the actual moat problem, not the technology.** Hibu, Scorpion and Townsquare acquire through outside sales reps doing cold calls and drop-ins, which is why they need $600 or more per month. A self-serve product at $149/mo has to acquire for well under $500 CAC in a market where Thryv's own seasoned net revenue retention is 90%. The hard question is not whether this can be built. It is how a non-technical excavator with no time ever finds a self-serve signup page.
